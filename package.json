@@ -1,0 +1,23 @@
+{
+  "name": "websocketserver",
+  "version": "1.0.0",
+  "description": "a simple implementation for websocket",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/joe06102/WebSocketServer.git"
+  },
+  "keywords": [
+    "websocket"
+  ],
+  "author": "joe06102",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/joe06102/WebSocketServer/issues"
+  },
+  "homepage": "https://github.com/joe06102/WebSocketServer#readme"
+}

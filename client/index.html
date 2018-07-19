@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>Page Title</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style>
+        ul, li {
+            list-style-type: none;
+        }
+        .sender {
+            text-align: left;
+        }
+        .receiver {
+            text-align: right;
+        }
+    </style>
+</head>
+
+<body>
+    <section>
+        <input id="addrEl" type="text" placeholder="remote address">
+        <button id="connectBtn">connect</button>
+        <button id="closeBtn">close</button>
+    </section>
+    <section>
+            <input id="textEl" type="text" placeholder="input message here">
+            <button id="sendBtn">send</button>
+        </section>    
+    <section>
+        <ul id="resList"></ul>
+    </section>
+    <script>
+        const $ = (selector) => document.querySelector(selector)
+        const addrEl = $('#addrEl')
+        const connBtn = $('#connectBtn')
+        const closeBtn = $('#closeBtn')
+        const textEl = $('#textEl')
+        const sendBtn = $('#sendBtn')
+        const resList = $('#resList')
+        let socket
+
+        connBtn.onclick = e => {
+            const address = addrEl.value
+
+            socket = new WebSocket(address)
+            socket.onopen = e => {
+                console.log('socket connected')
+                addrEl.disabled = true
+                connBtn.disabled = true
+            }
+            socket.onclose = e => {
+                console.log('socket closed')
+                addrEl.disabled = false
+                connBtn.disabled = false                
+            }
+            socket.onmessage = e => {
+                console.log(e.data)
+                const msg = document.createElement('li')
+                msg.className = 'receiver'
+                resList.appendChild(msg)
+            }
+            socket.onerror = e => {
+                console.log(e)
+            }
+        }
+        closeBtn.onclick = e => {
+            socket && socket.close()
+            addrEl.disabled = false
+            connBtn.disabled = false
+        }
+        sendBtn.onclick = e => {
+            const msgToSend = textEl.value
+
+            if(msgToSend) {
+                const msgEl = document.createElement('li')
+                msgEl.className = 'sender'
+                msgEl.textContent = msgToSend
+                resList.appendChild(msgEl)
+                socket.send(msgToSend)
+            }
+        }
+    </script>
+</body>
+
+</html>
