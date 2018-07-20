@@ -1,40 +1,26 @@
 const http = require('http')
-const WSPackage = require('./lib/WSPackage')
+const WebSocket = require('./lib/WebSocket').WebSocket
+const OPCODE = require('./lib/WebSocket').OPCODE
+const BitBuffer = require('./lib/BitBuffer')
 
-const GUID = '258EAFA5-E914-47DA-95CA-C5AB0DC85B11'
 const PORT = process.env.PORT || 5000
 const server = http.createServer()
 
 server.on('upgrade', (req, socket, head) => {
-    console.log(req.headers)
+    //console.log(req.headers)
+    const wsSocket = new WebSocket(socket)
+    console.log(req.headers['sec-websocket-key'])
 
-    const acceptCredential = WSPackage.computeNounce(req.headers['sec-websocket-key'], GUID)
-    console.log(acceptCredential)
-
-    socket.write(
-        'HTTP/1.1 101 Web Socket Protocol Handshake\r\n' +
-        'upgrade: websocket\r\n' +
-        'connection: upgrade\r\n' +
-        'sec-websocket-accept: ' + acceptCredential + '\r\n' +
-        '\r\n'
-    )
-
-    socket.on('data', buffers => {
-        //console.log(buffers)
-        const pack = new WSPackage(buffers)
-        pack.parse()
-
-        //console.log(pack)
-        console.log(Buffer.from(pack.payload).toString('utf8'))
-        
+    wsSocket.acceptUpgrade(req.headers['sec-websocket-key'])
+    wsSocket.on('message', (buffers, payloadType) => {
+        if(payloadType === OPCODE.TEXT_TYPE) {
+            console.log(buffers.toString('utf8'))
+        } else {
+            console.log(buffers)
+        }
     })
-
-    socket.on('close', () => {
+    wsSocket.on('close', () => {
         console.log('socket closed')
-    })
-
-    socket.on('error', err => {
-        console.log(err)
     })
 })
 

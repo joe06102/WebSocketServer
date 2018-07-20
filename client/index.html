@@ -10,6 +10,11 @@
         ul, li {
             list-style-type: none;
         }
+        .message-list {
+            width: 300px;
+            border: 1px solid #ccc;
+            background-color: #eee;
+        }
         .sender {
             text-align: left;
         }
@@ -27,10 +32,11 @@
     </section>
     <section>
             <input id="textEl" type="text" placeholder="input message here">
+            <input id="fileEl" type="file" placeholder="select files">
             <button id="sendBtn">send</button>
         </section>    
     <section>
-        <ul id="resList"></ul>
+        <ul id="resList" class="message-list"></ul>
     </section>
     <script>
         const $ = (selector) => document.querySelector(selector)
@@ -38,6 +44,7 @@
         const connBtn = $('#connectBtn')
         const closeBtn = $('#closeBtn')
         const textEl = $('#textEl')
+        const fileEl = $('#fileEl')
         const sendBtn = $('#sendBtn')
         const resList = $('#resList')
         let socket
@@ -73,6 +80,7 @@
         }
         sendBtn.onclick = e => {
             const msgToSend = textEl.value
+            const file = fileEl.files[0]
 
             if(msgToSend) {
                 const msgEl = document.createElement('li')
@@ -80,6 +88,15 @@
                 msgEl.textContent = msgToSend
                 resList.appendChild(msgEl)
                 socket.send(msgToSend)
+            } else if(file) {
+                const fr = new FileReader()
+                fr.onerror = e => { console.log(e) }
+                fr.onload = e => {
+                    const buffers = new Uint8Array(e.target.result)
+                    console.log(buffers)
+                    socket.send(buffers)
+                }
+                fr.readAsArrayBuffer(file)
             }
         }
     </script>
